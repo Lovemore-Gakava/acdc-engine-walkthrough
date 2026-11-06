@@ -1,0 +1,55 @@
+name: app
+
+# Builds app.R as a Shinylive site, where R and the engine run in the browser
+# through webR, and publishes it to GitHub Pages.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - name: Install packages
+        run: Rscript -e 'install.packages(c("shiny", "shinylive", "jsonlite", "nanoparquet", "car", "emmeans"))'
+      - name: Fetch and check TORIVA's ADLB
+        run: Rscript -e 'source("R/setup.R")'
+      - name: Assemble the app folder
+        run: |
+          mkdir -p build/app/data
+          cp -r app.R R inputs vendor build/app/
+          cp data/adlb.parquet build/app/data/
+      - name: The app starts and gives the recorded result
+        run: |
+          cd build/app
+          Rscript -e 'source("R/setup.R"); source("R/steps.R"); r <- engine_steps(as.data.frame(nanoparquet::read_parquet(adlb_path))); stopifnot(abs(r$contrast$estimate - 1.2757) < 1e-3)'
+      - name: Export with Shinylive
+        run: Rscript -e 'shinylive::export("build/app", "site")'
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

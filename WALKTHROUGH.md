@@ -160,8 +160,8 @@ As captured                                     1.276 (SE 2.215)   covariate: BA
    matches TORIVA's, and the result is TORIVA's own: 1.305 (SE 1.607). **The engine's answer
    depends on the order of records in the file.**
 
-Other things worth trying, by editing a copy of the files in `inputs/`: change the visit in the
-`endpoint` slice (`inputs/spec.json`), or remove the population filter.
+The app ([README](README.md)) offers these two and more: other visits, the population, and the
+saved chain's own values for the population and treatment filter, which stop the engine.
 
 ## What this walkthrough does not show
 

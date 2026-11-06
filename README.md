@@ -18,6 +18,18 @@ calls its functions one at a time, and prints what each one does. Nothing is cli
 nothing is hidden behind a screen. The inputs are files you can read, and the decisions that
 shape the result are listed in one place.
 
+## Use it in a browser
+
+**https://lovemore-gakava.github.io/acdc-engine-walkthrough/**
+
+The app runs the same engine in your browser, through webR: nothing to install. Change a
+decision (the covariate, the population, the visit, the order of the records) and every step
+runs again on all of TORIVA's ADLB. The first load takes a while, because R itself is
+downloading; after that each change takes a few seconds.
+
+To run the app locally instead: `shiny::runApp()` from this folder (needs the `shiny` package
+as well as the four below).
+
 ## Run it
 
 You need R (4.0 or later) and four packages:
@@ -72,10 +84,12 @@ The result is checked against the one usdm-acdc-in-practice recorded:
 ## What is in this repository
 
 ```
-walkthrough.R        the seven steps
+app.R                the app: the steps, with the decisions as settings
+walkthrough.R        the seven steps, printed
 experiments.R        two one-change experiments
-check.R              the app's own call to the engine, for comparison
+check.R              the CDISC app's own call to the engine, for comparison
 R/setup.R            pins, packages, data download, engine
+R/steps.R            the engine's steps as one function, shared by the app and the scripts
 inputs/              the nine inputs the app hands the engine, and the app's call (bootstrap.R)
 vendor/              CDISC's engine, unmodified, with its licence
 capture/             how inputs/ was produced from the app (needed only to regenerate it)
