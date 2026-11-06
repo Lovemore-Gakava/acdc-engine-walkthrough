@@ -1,0 +1,104 @@
+[
+  {
+    "slotKey": "T.CFB_ANCOVA/Change/0",
+    "method": {
+      "oid": "M.Subtraction"
+    },
+    "resolvedBindings": [
+      {
+        "concept": "Measure",
+        "requiredValueType": "Quantity",
+        "note": "Current visit value",
+        "direction": "input",
+        "dataStructureRole": "measure",
+        "methodRole": "minuend"
+      },
+      {
+        "concept": "Measure",
+        "requiredValueType": "Quantity",
+        "note": "Baseline-flagged record",
+        "direction": "input",
+        "dataStructureRole": "measure",
+        "methodRole": "subtrahend",
+        "slice": "parameter_baseline"
+      },
+      {
+        "concept": "Subject",
+        "methodRole": "partition",
+        "direction": "input",
+        "dataStructureRole": "dimension"
+      },
+      {
+        "methodRole": "constraint",
+        "direction": "input",
+        "dataStructureRole": "dimension",
+        "concept": "Parameter"
+      },
+      {
+        "methodRole": "partition",
+        "direction": "input",
+        "dataStructureRole": "dimension",
+        "concept": "AnalysisVisit"
+      },
+      {
+        "concept": "Change",
+        "direction": "output",
+        "dataStructureRole": "measure",
+        "methodRole": "difference"
+      },
+      {
+        "concept": "Subject",
+        "direction": "output",
+        "dataStructureRole": "dimension"
+      },
+      {
+        "direction": "output",
+        "dataStructureRole": "dimension",
+        "_layerNote": "Output dimension cascades from the endpoint's dimensionCategoryPicks: the user's choice of which category-member to use (e.g. Visit OC vs AnalysisVisit DC) propagates here so the derivation output cube and the analysis input cube speak the same layer.",
+        "concept": "Parameter"
+      },
+      {
+        "direction": "output",
+        "dataStructureRole": "dimension",
+        "_layerNote": "Output dimension cascades from the endpoint's dimensionCategoryPicks: the user's choice of which category-member to use (e.g. Visit OC vs AnalysisVisit DC) propagates here so the derivation output cube and the analysis input cube speak the same layer.",
+        "concept": "AnalysisVisit"
+      }
+    ],
+    "configurationValues": [],
+    "constraintValues": [
+      {
+        "dimension": "Observation.Identification.Topic",
+        "value": [
+          "ALPSERPL",
+          "SGPT",
+          "SGOT",
+          "BILISERPL",
+          "HGBBLD"
+        ]
+      }
+    ],
+    "resolvedSlices": [
+      {
+        "name": "parameter_baseline",
+        "constraints": [
+          {
+            "dimension": "Parameter",
+            "value": "Alanine Aminotransferase"
+          },
+          {
+            "dimension": "AnalysisVisit",
+            "value": "Baseline"
+          }
+        ],
+        "resolvedValues": {
+          "Parameter": "Alanine Aminotransferase",
+          "AnalysisVisit": "Baseline"
+        }
+      }
+    ],
+    "outputColumn": "__col_T_CFB_ANCOVA_Change_0",
+    "inputColumns": {},
+    "sourceStore": null,
+    "sourceDomain": null
+  }
+]

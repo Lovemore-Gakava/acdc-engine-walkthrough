@@ -1,0 +1,4 @@
+data/
+capture/node_modules/
+capture/package-lock.json
+.Rhistory

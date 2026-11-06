@@ -1,0 +1,13 @@
+{
+  "$comment": "What a person types at the app's step 8 (Execute) before pressing Execute. The app keeps these in memory only; the saved chain does not hold them. Values from usdm-acdc-in-practice docs/walkthrough.md, step 8, items 3 to 5.",
+  "endpoint": "Endpoint_SAFETY_LAB",
+  "datasetOverride": "adlb",
+  "varOverrides": {
+    "Measure": "BASE",
+    "Treatment": "TRT01P"
+  },
+  "sliceOverrides": {
+    "endpoint|Population": { "variable": "SAFFL", "value": "Y" },
+    "endpoint|Treatment": { "variable": "TRT01P", "value": "" }
+  }
+}

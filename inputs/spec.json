@@ -1,0 +1,143 @@
+{
+  "id": "Endpoint_SAFETY_LAB",
+  "name": "END-S5-LAB",
+  "level": "Secondary Endpoint",
+  "originalText": "Incidence and severity of TEAEs, SAEs, irAEs and AESIs; exposure-adjusted event rates. **Clinical laboratory evaluations** — haematology and chemistry parameters — are collected per §7.2 and analysed as change from baseline and as shifts in reference-range indicator.",
+  "targetDataset": "adlb",
+  "estimand": {
+    "population": "SAF",
+    "treatment": "Torivumab vs Placebo",
+    "variable": "Change change from baseline in Alanine Aminotransferase at C2D1 in the SAF population",
+    "populationLevelSummary": null,
+    "intercurrentEvents": null
+  },
+  "derivationPipeline": [
+    {
+      "transformationOid": "T.ChangeFromBaseline",
+      "name": "Change From Baseline",
+      "method": "M.Subtraction",
+      "inputs": [
+        {
+          "concept": "Measure",
+          "role": "minuend",
+          "dataStructureRole": "measure"
+        },
+        {
+          "concept": "Measure",
+          "role": "subtrahend",
+          "dataStructureRole": "measure",
+          "slice": "parameter_baseline"
+        },
+        {
+          "concept": "Subject",
+          "role": "partition",
+          "dataStructureRole": "dimension"
+        },
+        {
+          "concept": "ParameterDimension",
+          "conceptCategory": "ParameterDimension",
+          "role": "constraint",
+          "dataStructureRole": "dimension"
+        },
+        {
+          "concept": "VisitDimension",
+          "conceptCategory": "VisitDimension",
+          "role": "partition",
+          "dataStructureRole": "dimension"
+        }
+      ],
+      "output": {
+        "concept": "Change"
+      }
+    }
+  ],
+  "analyses": [
+    {
+      "sequence": 1,
+      "basedOn": {
+        "transformationId": "T.CFB_ANCOVA"
+      },
+      "resolvedBindings": [
+        {
+          "concept": "Change",
+          "methodRole": "response",
+          "direction": "input",
+          "dataStructureRole": "measure",
+          "requiredValueType": "Quantity"
+        },
+        {
+          "concept": "Measure",
+          "methodRole": "covariate",
+          "direction": "input",
+          "dataStructureRole": "measure",
+          "requiredValueType": "Quantity",
+          "slice": "parameter_baseline",
+          "description": "Baseline value of the endpoint parameter"
+        },
+        {
+          "concept": "Treatment",
+          "methodRole": "fixed_effect",
+          "direction": "input",
+          "dataStructureRole": "dimension",
+          "requiredValueType": "CodeableConcept",
+          "qualifierType": "IntentType",
+          "qualifierValue": "Planned"
+        },
+        {
+          "concept": "Subject",
+          "methodRole": "partition",
+          "direction": "input",
+          "dataStructureRole": "dimension"
+        },
+        {
+          "concept": "Parameter",
+          "methodRole": "constraint",
+          "direction": "input",
+          "dataStructureRole": "dimension",
+          "conceptCategory": "ParameterDimension"
+        },
+        {
+          "concept": "AnalysisVisit",
+          "methodRole": "constraint",
+          "direction": "input",
+          "dataStructureRole": "dimension",
+          "conceptCategory": "VisitDimension"
+        }
+      ],
+      "resolvedSlices": [
+        {
+          "name": "endpoint",
+          "resolvedValues": {
+            "Parameter": "Alanine Aminotransferase",
+            "Population": "Y",
+            "Treatment": "",
+            "Visit": "C2D1",
+            "AnalysisVisit": "C2D1"
+          },
+          "resolvedVariables": {
+            "Population": "SAFFL",
+            "Treatment": "TRT01P"
+          }
+        },
+        {
+          "name": "parameter_baseline",
+          "resolvedValues": {
+            "Parameter": "Alanine Aminotransferase",
+            "AnalysisVisit": "Baseline"
+          }
+        }
+      ],
+      "arsAnalysis": {
+        "analysisId": "ARS_T.CFB_ANCOVA_Endpoint_SAFETY_LAB"
+      },
+      "method": {
+        "oid": "M.ANCOVA",
+        "category": "TreatmentComparison"
+      },
+      "outputs": [],
+      "analysisInputColumns": {
+        "response": "__col_T_CFB_ANCOVA_Change_0"
+      }
+    }
+  ]
+}

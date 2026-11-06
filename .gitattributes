@@ -1,0 +1,4 @@
+# LF everywhere. The engine fails to parse with CRLF line endings, and setup.R
+# checks the vendored engine's checksum, which CRLF would also change.
+* text=auto eol=lf
+*.parquet binary

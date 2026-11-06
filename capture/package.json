@@ -1,0 +1,7 @@
+{
+  "name": "acdc-engine-walkthrough-capture",
+  "private": true,
+  "type": "module",
+  "description": "Captures the inputs CDISC's ac-dc-app hands its R engine. Needed only to regenerate inputs/.",
+  "dependencies": { "playwright": "1.65.0" }
+}
