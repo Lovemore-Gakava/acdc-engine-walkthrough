@@ -38,7 +38,11 @@ if (unname(tools::md5sum(adlb_path)) != PINS$data$md5) {
 
 # The engine: CDISC's file, unmodified (see vendor/analysis-concepts/SOURCE.md).
 engine_path <- file.path("vendor", "analysis-concepts", "acdc_engine.R")
-if (unname(tools::md5sum(engine_path)) != PINS$engine$md5) {
+# In the published app (R in the browser, through webR) Shinylive stores text files in its own
+# way, so the bytes differ; the publishing workflow runs this same check before it builds the
+# site, and the engine's non-ASCII characters are only in comments and printed messages.
+in_browser <- identical(R.version$os, "emscripten")
+if (!in_browser && unname(tools::md5sum(engine_path)) != PINS$engine$md5) {
   stop(engine_path, " differs from the pinned engine.", call. = FALSE)
 }
 source(file.path("vendor", "analysis-concepts", "acdc_engine.R"))
