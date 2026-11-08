@@ -1,6 +1,8 @@
 # What the app learns about each dataset when it is uploaded at step 8:
 # its columns, and the distinct values of each character column with 50 or fewer.
-# Mirrors loadXptFile() in ac-dc-app/js/utils/webr-engine.js.
+# Based on loadXptFile() in ac-dc-app/js/utils/webr-engine.js, with three differences: it reads
+# parquet rather than XPT, ignores factors (parquet has none here), and unboxes single values.
+# The capture check (capture/README.md) is what shows the result is the same.
 # Usage: Rscript capture/dataset-meta.R <adlb.parquet> <adsl.parquet> <out.json>
 args <- commandArgs(TRUE)
 meta <- list()

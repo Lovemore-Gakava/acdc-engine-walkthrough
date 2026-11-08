@@ -16,10 +16,10 @@ in no file except `capture/step8-settings.json` here, copied from usdm-acdc-in-p
 | The population | `SAFFL = Y` | **Typed at step 8.** The saved chain says `SAF`, a label that matches no data | Statistician, in the SAP |
 | The dataset | ADLB | **Typed at step 8** | Programmer, from the ADaM specification |
 | The treatment variable in the model | `TRT01P` (the app's default is `TRTP`) | **Typed at step 8** | Statistician and programmer |
-| The treatment filter | None: keep both arms | **Typed at step 8.** The saved chain says "Torivumab vs Placebo", a comparison label; left in place, it keeps one arm and the model fails | Nobody, today: a filter should not be there |
+| The treatment filter | None: keep both arms | **Typed at step 8.** The saved chain says "Torivumab vs Placebo", a comparison label; left in place, no record matches it and the engine stops at the slice step | Nobody, today: a filter should not be there |
 | The covariate | ADaM's `BASE` (the app's default is `AVAL`) | **Typed at step 8** | Statistician, in the SAP |
 | The baseline record used in the change | The first record in the baseline window | **Nowhere: fixed in the engine's code** (`acdc_engine.R`, line 1718) | Statistician, in the SAP. TORIVA uses the last record before first dose (`ABLFL = Y`) |
-| The direction of the comparison | Placebo minus torivumab | Nowhere: `emmeans::pairs()` takes the arms in alphabetical order | Statistician, in the SAP |
+| The direction of the comparison | Placebo minus torivumab | Nowhere: the engine makes the treatment variable a factor, which sorts the arms alphabetically (`acdc_engine.R`, line 2040), and the comparison is the first arm minus the second | Statistician, in the SAP |
 | The confidence level | 95% | The method's default (`inputs/method.json`, `alpha = 0.05`) | Statistician, in the SAP |
 
 Five of these twelve are typed at the last step and saved nowhere. Two more are not settings at

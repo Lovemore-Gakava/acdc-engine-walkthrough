@@ -5,9 +5,11 @@
 DEFAULT_SETTINGS <- list(
   order      = "file",    # "file": ADLB as TORIVA ships it; "latest": latest date first per subject
   covariate  = "BASE",    # "BASE": the step-8 override; "default": no override, the app's default
-  population = "SAFFL",   # "SAFFL", "ITTFL", or "saved": the saved chain's value (SAF on ITTFL)
+  population = "SAFFL",   # "SAFFL", "ITTFL", or "saved": the saved chain's value, SAF, on the app's
+                          #   default population variable, ITTFL (the chain holds only the value)
   visit      = "C2D1",    # the analysis visit, and the collected visit with it
-  treatment  = "none"     # "none": no filter (typed at step 8); "saved": the saved chain's label
+  treatment  = "none"     # "none": no filter (typed at step 8); "saved": the saved chain's label,
+                          #   on TRT01P, the variable typed at step 8
 )
 
 # Apply the settings to a copy of the captured inputs.
@@ -97,6 +99,25 @@ engine_steps <- function(adlb, settings = DEFAULT_SETTINGS, derived = NULL) {
     out$n_both <- sum(both)
   }
   out
+}
+
+# The same records fitted three ways: as the engine ran it, with the engine's baseline in both
+# places, and with ADaM's baseline in both. Shows what mixing the two baselines does.
+three_fits <- function(cube, response_col = "__col_T_CFB_ANCOVA_Change_0") {
+  d <- data.frame(engine_change = cube[[response_col]],
+                  engine_base = cube[["Measure.Result.Value__parameter_baseline"]],
+                  adam_change = cube[["Change"]], adam_base = cube[["BASE"]],
+                  treatment = factor(cube[["TRT01P"]]))
+  fit <- function(f) {
+    m <- stats::lm(f, data = d)
+    x <- as.data.frame(summary(pairs(emmeans::emmeans(m, ~ treatment), adjust = "none")))
+    data.frame(estimate = x$estimate, SE = x$SE, n = stats::nobs(m))
+  }
+  rbind(
+    cbind(model = "Mixed: engine's change, ADaM's BASE as covariate (the captured run)",
+          fit(engine_change ~ adam_base + treatment)),
+    cbind(model = "Engine's baseline in both", fit(engine_change ~ engine_base + treatment)),
+    cbind(model = "ADaM's baseline in both (TORIVA's CHG and BASE)", fit(adam_change ~ adam_base + treatment)))
 }
 
 # The same model on TORIVA's own ADaM variables, at the chosen visit and population.

@@ -14,4 +14,4 @@ if (!is.null(whole$engine_error)) stop("engine error: ", whole$engine_error, cal
 ct <- whole$contrasts
 cat(sprintf("acdc_execute(), as the app calls it: %.4f (SE %.4f)\n", ct$estimate, ct$SE))
 stopifnot(abs(ct$estimate - 1.2757) < 1e-3, abs(ct$SE - 2.2149) < 1e-3)
-cat("Matches the recorded result and the step-by-step run.\n")
+cat("Matches the result recorded by usdm-acdc-in-practice, which walkthrough.R also checks.\n")

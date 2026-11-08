@@ -9,6 +9,7 @@
 # calls them, and prints what came out. WALKTHROUGH.md explains each step.
 
 source(file.path("R", "setup.R"))
+options(width = 120)
 say <- function(...) cat(..., "\n", sep = "")
 rule <- function(title) cat("\n== ", title, " ", strrep("=", max(0, 66 - nchar(title))), "\n", sep = "")
 
@@ -101,20 +102,17 @@ say(sprintf("%s: %.3f (SE %.3f), 95%% CI %.2f to %.2f, df %d",
 
 # ---------------------------------------------------------------------------
 rule("Step 7  Check: the two baselines in that model")
+source(file.path("R", "steps.R"))
 b_concept <- cube[[baseline_col]]; b_adam <- cube[["BASE"]]
 both <- !is.na(b_concept) & !is.na(b_adam)
-say("Response: ALT minus the concept's baseline (the first record in the window)")
+say("Response: ALT minus the engine's baseline (the first record in the window, in file order)")
 say("Covariate: ADaM's BASE (the record TORIVA flags with ABLFL = Y)")
 say(sum(both & abs(b_concept - b_adam) > 1e-9), " of ", sum(both),
     " subjects have different values for the two")
-
-# The same model on TORIVA's own ADaM variables, for comparison.
-ref <- adlb[adlb$PARAM == "Alanine Aminotransferase" & adlb$AVISIT == "C2D1" &
-            adlb$SAFFL == "Y" & adlb$ANL01FL %in% "Y", ]
-fit <- stats::lm(CHG ~ BASE + TRT01P, data = ref)
-rc  <- as.data.frame(summary(pairs(emmeans::emmeans(fit, ~ TRT01P), adjust = "none")))
-say(sprintf("TORIVA's ADaM (CHG ~ BASE + TRT01P, ANL01FL = Y): %.3f (SE %.3f), n %d",
-            rc$estimate, rc$SE, stats::nobs(fit)))
+say("The same records, fitted three ways:")
+fits <- three_fits(cube)
+fits$estimate <- sprintf("%.3f", fits$estimate); fits$SE <- sprintf("%.3f", fits$SE)
+print(fits, row.names = FALSE, right = FALSE)
 
 # The result recorded by usdm-acdc-in-practice (endpoints/01-simple-lab-cfb/results.json).
 if (abs(ct$estimate - 1.2757) > 1e-3 || abs(ct$SE - 2.2149) > 1e-3) {

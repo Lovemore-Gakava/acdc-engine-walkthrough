@@ -60,14 +60,14 @@ ui <- fluidPage(
               c("ADaM's BASE" = "BASE", "The app's default" = "default"),
               "Typed on the app's last screen (step 8); saved nowhere."),
       setting("population", "Population",
-              c("SAFFL = Y" = "SAFFL", "ITTFL = Y" = "ITTFL", "As in the saved chain: SAF" = "saved"),
-              "Typed at step 8; the saved chain holds 'SAF'. In TORIVA's ADLB every ALT record is in both populations."),
+              c("SAFFL = Y" = "SAFFL", "ITTFL = Y" = "ITTFL", "The saved chain's value, SAF, on the app's default variable ITTFL" = "saved"),
+              "Typed at step 8; the saved chain holds only the value 'SAF'. In TORIVA's ADLB every ALT record is in both populations."),
       setting("visit", "Analysis visit",
               c("Cycle 2 Day 1" = "C2D1", "Cycle 3 Day 1" = "C3D1", "Cycle 4 Day 1" = "C4D1",
                 "Cycle 5 Day 1" = "C5D1", "Cycle 6 Day 1" = "C6D1"),
-              "In the saved chain."),
+              "In the saved chain. Sets the analysis visit and the collected visit together."),
       setting("treatment", "Treatment filter",
-              c("None: keep both arms" = "none", "As in the saved chain: 'Torivumab vs Placebo'" = "saved"),
+              c("None: keep both arms" = "none", "The saved chain's label, 'Torivumab vs Placebo', on TRT01P" = "saved"),
               "Typed at step 8; the saved chain holds a comparison label."),
       actionButton("reset", "Back to the captured run")
     ),
@@ -154,13 +154,12 @@ server <- function(input, output, session) {
                                      ncol(adlb()), if (input$order == "latest") ", sorted latest date first" else ""))
 
   output$step3 <- renderTable({
-    d <- derived()
-    kept <- d[d$Subject == SUBJECT & d$Parameter == "Alanine Aminotransferase",
-              "Measure.Result.Value__parameter_baseline"][1]
-    x <- adlb_file[adlb_file$USUBJID == SUBJECT & adlb_file$PARAM == "Alanine Aminotransferase" &
-                   adlb_file$AVISIT == "Baseline", c("VISIT", "ADT", "AVAL", "ABLFL")]
+    # The engine keeps the first of a subject's baseline records in the order of the file.
+    x <- adlb()[adlb()$USUBJID == SUBJECT & adlb()$PARAM == "Alanine Aminotransferase" &
+                adlb()$AVISIT == "Baseline", c("VISIT", "ADT", "AVAL", "ABLFL")]
+    x$`kept by the engine` <- c("yes", rep("", nrow(x) - 1))
+    x <- x[order(x$ADT), ]
     x$ADT <- format(x$ADT); x$ABLFL[is.na(x$ABLFL)] <- ""
-    x$`kept by the engine` <- ifelse(x$AVAL == kept, "yes", "")
     x
   })
 
@@ -196,11 +195,18 @@ server <- function(input, output, session) {
     if (is.null(r$contrast)) return(p(class = "skip", "Not reached."))
     cov <- r$roles[["covariate"]]
     what <- if (cov == "BASE") "ADaM's BASE, the record TORIVA flags (ABLFL = Y)" else
-      sprintf("%s, the value at the analysis visit itself, which the change is computed from", cov)
+      sprintf("%s, the value at the analysis visit itself: the end point the change is computed to", cov)
     tagList(p("Response: the value minus the engine's baseline, whichever record it finds first in the window."),
             p(paste0("Covariate: ", what, ".")),
             p(sprintf("For %d of %d subjects the engine's baseline differs from ADaM's BASE.",
-                      r$n_differ, r$n_both)))
+                      r$n_differ, r$n_both)),
+            p("The same records, fitted three ways. Either baseline used consistently gives close to",
+              "the same answer; mixing them widens the standard error, and at some visits moves the estimate."),
+            renderTable({
+              f <- three_fits(r$cube)
+              data.frame(Model = f$model, Estimate = sprintf("%.3f", f$estimate),
+                         SE = sprintf("%.3f", f$SE), n = f$n)
+            }))
   })
 }
 
